@@ -133,3 +133,147 @@ def parse_salary(salary_str):
         return None
 
     return np.mean(numbers)
+
+
+def extract_skill_frequencies(job_descriptions, skill_patterns):
+    """Extract skill frequencies from job descriptions using regex patterns.
+    
+    Args:
+        job_descriptions: pandas Series of job description strings
+        skill_patterns: dict mapping skill names to regex patterns
+        
+    Returns:
+        pandas DataFrame with columns: Skill, Mention Count, Percentage of Postings
+    """
+    posting_count = len(job_descriptions)
+    frequency_rows = []
+    
+    for skill, pattern in skill_patterns.items():
+        mention_count = job_descriptions.str.contains(pattern, case=False, regex=True).sum()
+        frequency_rows.append({
+            "Skill": skill,
+            "Mention Count": int(mention_count),
+            "Percentage of Postings": round(mention_count / posting_count * 100, 2),
+        })
+    
+    skill_frequency = (
+        pd.DataFrame(frequency_rows)
+        .sort_values(by="Mention Count", ascending=False)
+        .reset_index(drop=True)
+    )
+    
+    return skill_frequency
+
+
+# Skill patterns for data science job postings
+SKILL_PATTERNS = {
+    # Core programming / query
+    "Python": r"\bpython\b",
+    "R": r"(?<![A-Za-z0-9])r(?![A-Za-z0-9])|\br[- ]studio\b|\btidyverse\b",
+    "SQL": r"\bsql\b|\bpostgresql\b|\bmysql\b|\btsql\b|\bt-sql\b|\bpl/sql\b",
+    "SAS": r"\bsas\b",
+    "Excel": r"\bexcel\b|\bmicrosoft excel\b|\bspreadsheets?\b",
+
+    # Statistics / math / analytics
+    "Statistics": r"\bstatistic(?:s|al)?\b|\bprobability\b|\bhypothesis testing\b|\bstatistical modeling\b",
+    "A/B Testing": r"\ba/?b testing\b|\bexperiment(?:ation|s)?\b|\bmultivariate testing\b",
+    "Regression": r"\bregression\b|\blinear regression\b|\blogistic regression\b",
+    "Time Series": r"\btime series\b|\bforecasting\b|\barima\b|\bprophet\b",
+    "Optimization": r"\boptimization\b|\blinear programming\b|\bconvex optimization\b",
+
+    # ML / AI
+    "Machine Learning": r"\bmachine learning\b|\bml\b",
+    "Deep Learning": r"\bdeep learning\b|\bneural networks?\b|\bcnn\b|\brnn\b|\blstm\b|\btransformers?\b",
+    "NLP": r"\bnlp\b|\bnatural language processing\b|\btext mining\b|\btext analytics\b",
+    "Computer Vision": r"\bcomputer vision\b|\bimage processing\b|\bobject detection\b",
+    "Generative AI": r"\bgenerative ai\b|\bgenai\b|\bllms?\b|\blarge language models?\b|\bfoundation models?\b",
+    "Reinforcement Learning": r"\breinforcement learning\b|\brl\b",
+
+    # ML libraries
+    "Scikit-learn": r"\bscikit[- ]learn\b|\bsklearn\b",
+    "TensorFlow": r"\btensorflow\b",
+    "PyTorch": r"\bpytorch\b",
+    "Keras": r"\bkeras\b",
+    "XGBoost": r"\bxgboost\b",
+    "LightGBM": r"\blightgbm\b",
+    "CatBoost": r"\bcatboost\b",
+
+    # Data manipulation / notebooks
+    "Pandas": r"\bpandas\b",
+    "NumPy": r"\bnumpy\b",
+    "SciPy": r"\bscipy\b",
+    "Jupyter": r"\bjupyter\b|\bjupyter notebook\b|\bnotebooks?\b",
+
+    # Visualization / BI
+    "Tableau": r"\btableau\b",
+    "Power BI": r"\bpower bi\b|\bpowerbi\b",
+    "Looker": r"\blooker\b|\blooker studio\b",
+    "Matplotlib": r"\bmatplotlib\b",
+    "Seaborn": r"\bseaborn\b",
+    "Plotly": r"\bplotly\b",
+    "Data Visualization": r"\bdata visualization\b|\bdata visualisation\b|\bdashboard(?:s)?\b",
+
+    # Big data / distributed
+    "Spark": r"\bspark\b|\bapache spark\b|\bpyspark\b",
+    "Hadoop": r"\bhadoop\b",
+    "Hive": r"\bhive\b",
+    "Kafka": r"\bkafka\b|\bapache kafka\b",
+    "Databricks": r"\bdatabricks\b",
+
+    # Data engineering / orchestration
+    "ETL": r"\betl\b|\belt\b|\bdata pipelines?\b",
+    "Airflow": r"\bairflow\b|\bapache airflow\b",
+    "dbt": r"\bdbt\b",
+    "Snowflake": r"\bsnowflake\b",
+    "Redshift": r"\bredshift\b",
+    "BigQuery": r"\bbigquery\b|\bgoogle bigquery\b",
+
+    # Cloud
+    "AWS": r"\baws\b|\bamazon web services\b",
+    "Azure": r"\bazure\b|\bmicrosoft azure\b",
+    "GCP": r"\bgcp\b|\bgoogle cloud\b|\bgoogle cloud platform\b",
+
+    # Databases / storage
+    "NoSQL": r"\bnosql\b|\bmongodb\b|\bcassandra\b|\bdynamodb\b",
+    "MongoDB": r"\bmongodb\b",
+    "PostgreSQL": r"\bpostgresql\b|\bpostgres\b",
+    "MySQL": r"\bmysql\b",
+
+    # Software / deployment
+    "Git": r"\bgit\b|\bgithub\b|\bgitlab\b",
+    "Docker": r"\bdocker\b",
+    "Kubernetes": r"\bkubernetes\b|\bk8s\b",
+    "Linux": r"\blinux\b",
+    "API": r"\bapi(?:s)?\b|\brest api(?:s)?\b",
+
+    # Business / product-oriented analytics
+    "Business Intelligence": r"\bbusiness intelligence\b|\bbi\b",
+    "Data Mining": r"\bdata mining\b",
+    "Feature Engineering": r"\bfeature engineering\b",
+    "Model Deployment": r"\bmodel deployment\b|\bmodel serving\b|\bmachine learning ops\b|\bmlops\b",
+    "Data Warehousing": r"\bdata warehouse\b|\bdata warehousing\b",
+
+    # Common DS adjacent tools
+    "PowerPoint": r"\bpowerpoint\b|\bmicrosoft powerpoint\b",
+    "Communication": r"\bcommunication skills?\b|\bpresentation skills?\b|\bstakeholder management\b",
+}
+
+
+def extract_skill_lists(job_descriptions, skill_patterns):
+    """Extract lists of skills present in each job description.
+    
+    Args:
+        job_descriptions: pandas Series of job description strings
+        skill_patterns: dict mapping skill names to regex patterns
+        
+    Returns:
+        list of lists: each sublist contains skills found in that job description
+    """
+    skill_lists = []
+    for desc in job_descriptions:
+        skills_present = []
+        for skill, pattern in skill_patterns.items():
+            if re.search(pattern, desc, re.IGNORECASE):
+                skills_present.append(skill)
+        skill_lists.append(skills_present)
+    return skill_lists
