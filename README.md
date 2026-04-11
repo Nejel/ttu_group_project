@@ -8,6 +8,7 @@
 * (3) Remote positions will more frequently require specialized and self-directed skills compared to non-remote roles, which will emphasize broader skill sets. 
 * (4) Job postings in technology and finance industries will exhibit higher average salaries and more advanced skill requirements than other sectors. 
 * (5) Company-level attributes (e.g., size, rating, and revenue) will positively correlate with offered salary ranges in job listings. 
+* (6) Remote data science postings will skew more senior and include fewer entry-level roles than non-remote postings.
 
 ## Project log and outcomes 
 
@@ -27,6 +28,14 @@ To address this issue, we applied LLM-based text classification for deeper conte
 Details and all the explanations are available in the file: [`experiment_1.ipynb`](./experiment_1.ipynb)
 
 
+
+### Experiment 6
+
+Experiment 6 focuses on whether remote data science postings are equally accessible across experience levels. Using the unified dataset, we inferred seniority from `job_title` and identified remote roles from `location`.
+
+The results show that remote postings are much less entry-level friendly than non-remote postings. Only about 0.3% of remote roles were classified as entry-level, compared with about 2.9% of non-remote roles, while remote roles were substantially more likely to be senior-level. This difference was statistically significant, supporting the idea that remote-only job search filters push candidates toward more experienced roles.
+
+Details and all the explanations are available in the file: [`experiment_6.ipynb`](./experiment_6.ipynb)
 
 ## Datasets 
 
