@@ -1,4 +1,50 @@
+from IPython.display import display
+import hashlib
+import json
+import re
+import time
+from urllib import error, request
+from pathlib import Path
+import pandas as pd
+
+LM_STUDIO_BASE_URL = 'http://127.0.0.1:1234/v1'
+LM_STUDIO_MODEL = 'qwen/qwen3-4b-thinking-2507'
+LM_CACHE_PATH = Path('data/llm_ml_check_glassdoor_2023_cache.csv')
+LM_TIMEOUT_SECONDS = 300
+LM_TEMPERATURE = 0.0
+LM_BATCH_SIZE = 10
+LM_JOB_DESCRIPTION_CHAR_LIMIT = 300
+
+LM_CACHE_COLUMNS = [
+    'source_index',
+    'description_hash',
+    'llm_ml_label',
+    'llm_ml_confidence',
+    'model_id',
+]
+
+
+LM_ML_PROMPT_TEMPLATE = """/no_think
+Classify each vacancy for machine-learning relevance.
+
+Return one result for every source_index.
+Use label 1 if machine learning is central to the role.
+Use label 0 if machine learning is incidental or hype-like.
+
+Use only the provided description excerpt for each vacancy.
+
+Preferred final answer format is JSON:
+{{"results": [{{"source_index": 123, "label": 0, "confidence": 0.75}}]}}
+
+If JSON is not possible, output exactly one compact line per vacancy in this format and nothing else:
+source_index=123|label=0|confidence=0.75
+
+Vacancies:
+{batch_payload}"""
+
+
 def _normalize_llm_content(content):
+
     cleaned = str(content).strip()
     cleaned = re.sub(r'<think>.*?</think>', '', cleaned, flags=re.DOTALL | re.IGNORECASE).strip()
     cleaned = re.sub(r'^```(?:json)?\s*', '', cleaned)
