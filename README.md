@@ -51,3 +51,15 @@ Details and all the explanations are available in the file: [`experiment_6.ipynb
 > 
 > Records amount: 994 data science related jobs collected in 2025 
 
+
+**Dataset 3**: DataScience Job Postings April 2026
+
+> Source: Collected by authors during the project using web-scraper (internal tool)
+> 
+> Records amount: 100 data science related jobs in USA and Europe, posted in April 2026
+
+## Tools
+
+**Internal Tool 1**: Job Postings parser 
+
+**External Tool 1**: LLM qwen/qwen3-4b-thinking-2507 running locally using LM Studio and requesting via API calls.
