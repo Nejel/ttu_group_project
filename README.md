@@ -56,10 +56,10 @@ Details and all the explanations are available in the file: [`experiment_6.ipynb
 
 > Source: Collected by authors during the project using web-scraper (internal tool)
 > 
-> Records amount: 100 data science related jobs in USA and Europe, posted in April 2026
+> Records amount: 1000 data science related jobs in USA and Europe, posted in April 2026
 
 ## Tools
 
-**Internal Tool 1**: Job Postings parser 
+**Internal Tool 1**: Job Postings parser to parse LinkedIn Job Postings
 
 **External Tool 1**: LLM qwen/qwen3-4b-thinking-2507 running locally using LM Studio and requesting via API calls.
