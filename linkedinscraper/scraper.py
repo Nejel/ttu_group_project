@@ -3,25 +3,87 @@
 #---------------------------#
 #         Group 15          #
 #############################
+
+
+
 # ==========================
 # Config
 # ==========================
-citySearch = [("Dallas", "TX"), ("Los Angeles", "CA"), ("Chicago", "IL"), ("New York City", "NY"), ("Miami", "FL")]
-jobKeywords = ["engineer", "analyst", "developer"]
-searchDepth = 100
-source = ["LinkedIn","builtIn","Glassdoor","Indeed"] #LinkedIn, builtIn, Glassdoor, Indeed
+
+# Where to save the scraped data
+filename = 'data/our_own_dataset/jobs_london_1000.csv'
+# !_! Do not forget to change filename before running, otherwise will be overwritten !_!
+
+searchDepth = 1000       # how many jobs to scrape in 
+save_step = 50          # save the data to CSV every 50 jobs to avoid losing progress 
+
+# USA search cities and states configuration 
+# citySearch = [
+              # ("Dallas", "TX"), ("Austin", "TX")
+              # ("Los Angeles", "CA"), ("Chicago", "IL"), ("New York City", "NY"), ("Miami", "FL")
+              # ]
+
+# European search cities and states configuration
+citySearch = [
+    ("London", "United Kingdom"), 
+    # ("Paris", "France"), ("Berlin", "Germany"), 
+    # ("Amsterdam", "Netherlands"), ("Dublin", "Ireland"),("Barcelona", "Spain") 
+    ]
+
+# More or less full keywords list 
+jobKeywords = [
+    "data scientist",
+    "senior data scientist",
+    "junior data scientist",
+    "data analyst",
+    "business analyst",
+    "business intelligence analyst",
+    "bi analyst",
+    "machine learning engineer",
+    "ml engineer",
+    "ai engineer",
+    "applied scientist",
+    "research scientist",
+    "data engineer",
+    "senior data engineer",
+    "etl developer",
+    "analytics engineer",
+    "big data engineer",
+    "decision scientist",
+    "quantitative analyst",
+    "statistical analyst",
+    "predictive analyst",
+    "nlp engineer",
+    "computer vision engineer",
+    "deep learning engineer",
+    "ai/ml engineer",
+    "data science engineer",
+    "data architect",
+    "ml scientist",
+    "operations research analyst"
+]
+
+
+
 # ==========================
 # Libraries
 # ==========================
+
 import requests as r
 from bs4 import BeautifulSoup
 import csv
 import time
+from pathlib import Path
+
+
+
 # ==========================
 # Functions
 # ==========================
-def getLinked(cityQuery, jobQuery, howMany):
+
+def getLinked(cityQuery, jobQuery, howMany, saveEvery=None):
     allJobs = []
+    saveEvery = saveEvery if saveEvery and saveEvery > 0 else None
     
     for city, state in cityQuery:
         for job in jobQuery:
@@ -33,6 +95,8 @@ def getLinked(cityQuery, jobQuery, howMany):
                 if len(allJobs) >= howMany:
                     break
                 allJobs.append(listing)
+                if saveEvery and len(allJobs) % saveEvery == 0:
+                    writeCSV(allJobs, is_checkpoint=True)
             
             time.sleep(2)
             
@@ -40,6 +104,7 @@ def getLinked(cityQuery, jobQuery, howMany):
                 break
     
     return allJobs
+
 
 def linkedQuery(city, state, job):
     URL = 'https://www.linkedin.com/jobs/search/'
@@ -107,24 +172,37 @@ def linkedQuery(city, state, job):
     
     return jobs
 
-def writeCSV(jobs):
-    with open('jobs.csv', 'w', newline='', encoding='utf-8') as file:
+
+def writeCSV(jobs, is_checkpoint=False):
+    output_path = Path(filename)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(output_path, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_NONNUMERIC)
         writer.writerow(['title', 'company', 'location', 'salary', 'workType', 'description', 'link', 'source'])
         
         for job in jobs:
             writer.writerow([job['title'], job['company'], job['location'], job['salary'], job['workType'], job['description'], job['link'], job['source']])
     
-    print('Exported ' + str(len(jobs)) + ' jobs to jobs.csv')
+    if is_checkpoint:
+        print(f'[CHECKPOINT] Saved {len(jobs)} jobs to {output_path}')
+    else:
+        print(f'Exported {len(jobs)} jobs to {output_path}')
+
+
+
 # ==========================
 # Main program
 # ==========================
 def main():
     print("[START] Scraping")
-    jobs = getLinked(citySearch, jobKeywords, searchDepth)
+    jobs = getLinked(citySearch, jobKeywords, searchDepth, save_step)
     print("[COMPLETE] Scraping")
-    
+
     writeCSV(jobs)
+
+
+
 # ==========================
 # Execution
 # ==========================
