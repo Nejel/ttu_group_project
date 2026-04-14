@@ -19,6 +19,7 @@ UNIFIED_REQUIRED_COLUMNS = [
 class DatasetSpec:
     source_name: str
     column_mapping: Mapping[str, str]
+    file_path: Path | None = None
     required_targets: Sequence[str] = field(default_factory=lambda: tuple(UNIFIED_REQUIRED_COLUMNS))
     optional_targets: Sequence[str] = field(default_factory=tuple)
     extra_passthrough: Sequence[str] = field(default_factory=tuple)
@@ -27,6 +28,7 @@ class DatasetSpec:
 DEFAULT_SPECS = [
     DatasetSpec(
         source_name="glassdoor_2023",
+        file_path=Path("data/glassdoor_jobs_2023.csv"),
         column_mapping={
             "Job Title": "job_title",
             "Location": "location",
@@ -46,6 +48,7 @@ DEFAULT_SPECS = [
     ),
     DatasetSpec(
         source_name="data_science_job_posts_2025",
+        file_path=Path("data/data_science_job_posts_2025.csv"),
         column_mapping={
             "job_title": "job_title",
             "location": "location",
@@ -66,6 +69,36 @@ DEFAULT_SPECS = [
         ],
     ),
 ]
+
+OUR_OWN_DATASET_DIR = Path("data/our_own_dataset")
+OUR_OWN_DATASET_COLUMN_MAPPING = {
+    "title": "job_title",
+    "location": "location",
+    "salary": "salary_range",
+    "description": "job_description_skills",
+}
+OUR_OWN_DATASET_PASSTHROUGH_COLUMNS = (
+    "company",
+    "workType",
+    "link",
+    "source",
+)
+
+
+def _build_default_sources() -> list[DatasetSpec]:
+    default_sources = list(DEFAULT_SPECS)
+
+    for dataset_path in sorted(OUR_OWN_DATASET_DIR.glob("*.csv")):
+        default_sources.append(
+            DatasetSpec(
+                source_name="our_own_dataset",
+                file_path=dataset_path,
+                column_mapping=OUR_OWN_DATASET_COLUMN_MAPPING,
+                extra_passthrough=OUR_OWN_DATASET_PASSTHROUGH_COLUMNS,
+            )
+        )
+
+    return default_sources
 
 
 def _normalize_dataset(df: pd.DataFrame, spec: DatasetSpec) -> pd.DataFrame:
@@ -109,14 +142,19 @@ def build_unified_jobs_df(
     dataframes: list[pd.DataFrame] | None = None,
     sources: list[DatasetSpec] | None = None,
 ) -> pd.DataFrame:
-    active_sources = sources or list(DEFAULT_SPECS)
+    active_sources = sources if sources is not None else _build_default_sources()
+
+    if not active_sources:
+        raise ValueError("At least one dataset spec is required.")
 
     if dataframes is None:
-        path_map = {
-            "glassdoor_2023": Path("data/glassdoor_jobs_2023.csv"),
-            "data_science_job_posts_2025": Path("data/data_science_job_posts_2025.csv"),
-        }
-        dataframes = [pd.read_csv(path_map[source.source_name]) for source in active_sources]
+        dataframes = []
+        for source in active_sources:
+            if source.file_path is None:
+                raise ValueError(
+                    "All dataset specs must define file_path when dataframes are not provided."
+                )
+            dataframes.append(pd.read_csv(source.file_path))
 
     if len(dataframes) != len(active_sources):
         raise ValueError("The number of dataframes must match the number of dataset specs.")
