@@ -11,56 +11,141 @@
 # ==========================
 
 # Where to save the scraped data
-filename = 'data/our_own_dataset/jobs_london_1000.csv'
+filename = 'data/our_own_dataset/jobs_all_US_non_data_science_10000.csv'
 # !_! Do not forget to change filename before running, otherwise will be overwritten !_!
 
 searchDepth = 1000       # how many jobs to scrape in 
-save_step = 50          # save the data to CSV every 50 jobs to avoid losing progress 
+save_step = 50           # save the data to CSV every 50 jobs to avoid losing progress 
 
 # USA search cities and states configuration 
-# citySearch = [
-              # ("Dallas", "TX"), ("Austin", "TX")
-              # ("Los Angeles", "CA"), ("Chicago", "IL"), ("New York City", "NY"), ("Miami", "FL")
-              # ]
+citySearch = [
+            #   ("Dallas", "TX"), 
+            ("Austin", "TX"),
+            ("Los Angeles", "CA"), ("Chicago", "IL"), ("New York City", "NY"), ("Miami", "FL")
+            ]
 
 # European search cities and states configuration
-citySearch = [
-    ("London", "United Kingdom"), 
+# citySearch = [
+    # ("London", "United Kingdom"), 
     # ("Paris", "France"), ("Berlin", "Germany"), 
-    # ("Amsterdam", "Netherlands"), ("Dublin", "Ireland"),("Barcelona", "Spain") 
-    ]
+    # ("Amsterdam", "Netherlands"), ("Dublin", "Ireland"),("Barcelona", "Spain") ]
 
-# More or less full keywords list 
+
+# Additional keyword set focused on title families that were still under-covered
+# in experiment_8 TITLE_FAMILY_PATTERNS.
+
 jobKeywords = [
-    "data scientist",
-    "senior data scientist",
-    "junior data scientist",
-    "data analyst",
-    "business analyst",
-    "business intelligence analyst",
-    "bi analyst",
-    "machine learning engineer",
-    "ml engineer",
-    "ai engineer",
-    "applied scientist",
-    "research scientist",
-    "data engineer",
-    "senior data engineer",
-    "etl developer",
-    "analytics engineer",
-    "big data engineer",
-    "decision scientist",
-    "quantitative analyst",
-    "statistical analyst",
-    "predictive analyst",
-    "nlp engineer",
-    "computer vision engineer",
-    "deep learning engineer",
-    "ai/ml engineer",
-    "data science engineer",
+    #     # Core data science / analytics roles  
+    #     "data scientist",
+    #     "senior data scientist",
+    #     "junior data scientist",
+    #     "data analyst",
+    #     "business analyst",
+    #     "business intelligence analyst",
+    #     "bi analyst",
+    #     "machine learning engineer",
+    #     "ml engineer",
+    #     "ai engineer",
+    #     "applied scientist",
+    #     "research scientist",
+    #     "data engineer",
+    #     "senior data engineer",
+    #     "etl developer",
+    #     "analytics engineer",
+    #     "big data engineer",
+    #     "decision scientist",
+    #     "quantitative analyst",
+    #     "statistical analyst",
+    #     "predictive analyst",
+    #     "nlp engineer",
+    #     "computer vision engineer",
+    #     "deep learning engineer",
+    #     "ai/ml engineer",
+    #     "data science engineer",
+    #     "data architect",
+    #     "ml scientist",
+    #     "operations research analyst",
+
+
+    # # Non direct DS jobs, but potentially related 
+    # # Senior leadership / management
+    # # Batch 1 starts here
+
+    "vice president data",
+    "vice president analytics",
+    "vp data",
+    "vp analytics",
+    "director data science",
+    "director analytics",
+    "director machine learning",
+    "data science manager",
+    "analytics manager",
+    "head of data",
+    "head of analytics", # Dallas, TX has a 550 at that point 
+    "chief data officer",
+
+    # # Early-career / graduate pipeline
+    "data science intern",
+    "machine learning intern",
+    "analytics intern",
+    "data engineer intern", # Dallas, TX has a 850 at that point
+    "graduate data scientist",
+    "graduate data engineer",
+    "new grad data scientist",
+    "co-op data science", # Dallas, TX has a 1000 at that point
+
+    # Consultant / architect / software 
+    # Batch 2 starts here 
+    "data consultant",
+    "analytics consultant",
+    "machine learning consultant",
+    "solutions architect",
     "data architect",
-    "ml scientist",
-    "operations research analyst"
+    "software engineer machine learning",
+    "data software engineer", # Dallas, TX has a 350 (Batch 2) at that point
+
+    # NLP / LLM / GenAI
+    "llm engineer",
+    "llm scientist", # Dallas, TX has a 450 (Batch 2) at that point
+    "language model engineer",
+    "language model scientist",
+    "generative ai engineer",
+    "generative ai scientist",
+    "prompt engineer",
+    "natural language processing engineer",
+    "natural language processing scientist",
+
+    # MLOps / deployment
+    "mlops engineer", # Dallas, TX has a 750 (Batch 2) at that point
+    "machine learning ops engineer",
+    "machine learning operations engineer",
+    "model deployment engineer",
+    "model serving engineer",
+
+    # Visualization / reporting
+    "power bi developer",
+    "tableau developer",
+    "report developer",
+    "reporting developer",
+    "dashboard developer",
+    "visualization engineer",
+
+    # Scientist / specialist / admin
+    "associate scientist",
+    "bioinformatics scientist",
+    "data specialist",
+    "analytics specialist",
+    "database administrator",
+    "database admin",
+    "sql dba",
+    "database engineer",
+
+    # Extra data-engineering variants
+    "data platform engineer",
+    "data warehouse engineer",
+    "pipeline engineer",
+    "data developer",
+    "hadoop developer"
 ]
 
 

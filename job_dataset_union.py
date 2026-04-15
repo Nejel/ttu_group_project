@@ -142,6 +142,36 @@ def build_unified_jobs_df(
     dataframes: list[pd.DataFrame] | None = None,
     sources: list[DatasetSpec] | None = None,
 ) -> pd.DataFrame:
+    """
+    
+    Build a single normalized jobs DataFrame from all configured sources.
+
+    How it works:
+    1. Resolve the active dataset specifications. If ``sources`` is not
+       provided, the function uses the default source list created by
+       ``_build_default_sources()``.
+    2. The default source list includes the built-in datasets
+       (``glassdoor_2023`` and ``data_science_job_posts_2025``) and also
+       automatically adds every ``*.csv`` file found under
+       ``data/our_own_dataset`` as a separate source specification.
+    3. Read each source file with ``pandas.read_csv`` unless explicit
+       ``dataframes`` are provided by the caller.
+    4. Normalize each dataset to the shared schema via ``_normalize_dataset``.
+       This applies the column mapping for that source, guarantees the unified
+       required columns, preserves selected passthrough columns, and adds a
+       ``source_dataset`` column.
+    5. Concatenate all normalized frames into one DataFrame and return the
+       columns in a consistent order.
+
+    Notes:
+    - All CSV files inside ``data/our_own_dataset`` are included automatically.
+    - Those custom files are all labeled with the same
+      ``source_dataset == "our_own_dataset"`` value unless the caller provides
+      a custom ``sources`` list with different metadata.
+    - If ``dataframes`` is provided, its length must match the number of active
+      source specifications.
+
+    """
     active_sources = sources if sources is not None else _build_default_sources()
 
     if not active_sources:
